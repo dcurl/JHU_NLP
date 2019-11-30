@@ -1,0 +1,307 @@
+---
+title: "JHU Final Project NLP 2"
+author: "Daniela Curl"
+date: "11/14/2019"
+output: html_document
+---
+## Step 0: Load Libraries
+```{r r-libraries}
+library(dplyr)
+library(ngram) # To create ngrams
+library(tokenizers) # To quickly break a character vector into sentences
+library(textcat) # To detect foreign languages
+library(stringr) # To pull word from vector, didn't end up needing this
+library(reshape2) # To merge vectors into dataframe
+```
+
+## Step 1a: Read in Data
+```{r readin-data}
+## Read in US Text files
+news_txt <- readLines("~/Documents/Education/JHU/capstone/final/en_US/en_US.news.txt")
+blogs_txt <- readLines("~/Documents/Education/JHU/capstone/final/en_US/en_US.blogs.txt")
+twitter_txt <- readLines("~/Documents/Education/JHU/capstone/final/en_US/en_US.twitter.txt")
+
+## Read in Innappropriate words
+## Reference: https://www.cs.cmu.edu/~biglou/resources/
+bad_words <- readLines('http://www.bannedwordlist.com/lists/swearWords.txt')
+```
+
+## Step 1b: Set Up Functions
+```{r setup-functions}
+
+# Function to remove (set of provided) words from dataset
+removeWords <- function(str, stopwords) {
+        x <- unlist(strsplit(str, " "))
+        out <- paste(x[!x %in% stopwords], collapse = " ")
+        return(out)
+}
+
+# Funtion to remove punctuation, anomolies from dataset
+removePunctuation <- function(str) {
+        out <- gsub("\\.","", str)
+        out <- gsub("\\--","", out)
+        out <- gsub("\\,","", out)
+        out <- gsub("\\'","", out)
+        out <- gsub("\\]","", out)
+        out <- gsub("\\[","", out)
+        out <- gsub("\\)","", out)
+        out <- gsub("\\(","", out)
+        out <- gsub('"', '', out)
+        out <- gsub('/', '', out)
+        out <- gsub('', '', out)
+        out <- gsub('�', '', out)
+        out <- gsub(':', '', out)
+        return(out)
+}
+
+# Function comprised of smaller functions that will clean text and use appropriate backoff method depending on the amount of words user has entered.
+makePrediction<- function(str) {
+        text <- cleanInput(str)
+        findLocations(text)
+}
+
+# Function that cleans user Input
+cleanInput<- function(str) {
+        
+        # Load in libraries, just in case
+        library(stringr)
+        library(ngram)
+        
+        # Get Length of user input string
+        len <- sapply(strsplit(str, " "), length)
+        
+        # If user accidentally/sneakily added nothing, return error.
+        if(len == 0) {
+                print("Please enter some text.")
+                
+        }
+        
+        # If the user entered a phrase with more words than ngram size, cut off
+        # beginning words, clean text and proceed
+        else if(len > 7) {
+                subtract <- len - 6
+                str <- word(str, subtract, -1)
+                str <- preprocess(str, case ="lower", remove.punct = TRUE)
+                str <- paste("^", str,sep="")
+        }
+        
+        # If the user entered a phrase with less words than ngram size, clean text 
+        # and proceed
+        else {
+                str <- preprocess(str, case ="lower", remove.punct = TRUE)
+                str <- paste("^", str,sep="") 
+        }
+        
+        # Return cleaned user input which is ready for analysis
+        return(str)
+}
+
+# Function that finds
+findLocations <- function(str) {
+        
+        # Get length of user entered phrase'
+        len <- sapply(strsplit(str, " "), length)
+        
+        # First check to see what ngram to use and then
+        # loop until iteration with locations returned'
+        if(len == 7) {
+                locations <- grep(str, eight$ngrams)
+                empty <- length(locations) == 0
+        }
+        else if(len == 6){
+                locations <- grep(str, seven$ngrams)
+                empty <- length(locations) == 0
+        }
+        else if(len == 5){
+                locations <- grep(str, six$ngrams)
+                empty <- length(locations) == 0
+        }
+        else if(len == 4){
+                 locations <- grep(str, five$ngrams)
+                 empty <- length(locations) == 0
+        }
+        else if(len == 3){
+                locations <- grep(str, four$ngrams)
+                empty <- length(locations) == 0
+        }
+        else if(len == 2){
+                locations <- grep(str, three$ngrams)
+                empty <- length(locations) == 0
+        }
+        else if(len == 1){
+                locations <- grep(str, two$ngrams)
+                empty <- length(locations) == 0
+        }
+        else{
+                print("Text not long enough/no text detected")
+        }
+        
+        #If matches are found, return locations and phrase
+        #Later will call different function
+        #else, remove word from beginning of phrase and recursively check again
+        if (len == 0) {
+                print("No matches were found.")
+        }
+        else if (empty == FALSE){
+                #print(concatenate(str, len, locations))
+                getPredictions(len, head(locations, 10))
+        }
+        else {
+                str <- word(str, 2, -1)
+                str <- cleanInput(str)
+                findLocations(str)
+        }
+}
+        
+        
+getPredictions <- function(len, locations)  {
+        if(len == 7) {
+                j = 1
+                for (i in locations) {
+                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", eight$ngrams[i]))
+                        j = j + 1
+                }
+        }
+        else if(len == 6) {
+                j = 1
+                for (i in locations) {
+                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", seven$ngrams[i]))
+                        j = j + 1
+                }
+        }
+        else if(len == 5){
+                j = 1
+                for (i in locations) {
+                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", six$ngrams[i]))
+                        j = j + 1
+                }
+        }
+        else if(len == 4){
+                j = 1
+                for (i in locations) {
+                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", five$ngrams[i]))
+                        j = j + 1
+                }
+        }
+        else if(len == 3){
+                j = 1
+                for (i in locations) {
+                       print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", four$ngrams[i]))
+                        j = j + 1
+                }
+        }
+        else if(len == 2){
+                j = 1
+                for (i in locations) {
+                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", three$ngrams[i]))
+                        j = j + 1
+                }
+        }
+        else if(len == 1){
+                j = 1
+                for (i in locations) {
+                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", two$ngrams[i]))
+                        j = j + 1
+                }
+        }
+        else {
+                print("Cannot predict")
+        }
+}
+```
+
+## Step 2: Clean Data
+```{r clean-data}
+# Remove inappropriate words
+news_sentences_clean <- removeWords(news_txt, bad_words)
+blog_sentences_clean <- removeWords(blogs_txt, bad_words)
+twitter_sentences_clean <- removeWords(twitter_txt, bad_words)
+
+# Use tokenize package to turn back into list of sentences
+news_sentences_clean <- tokenize_sentences(news_sentences_clean)
+blog_sentences_clean <- tokenize_sentences(blog_sentences_clean)
+twitter_sentences_clean <- tokenize_sentences(twitter_sentences_clean)
+
+# Covert back to character vector of elements
+news_sentences_clean <- unlist(news_sentences_clean, use.names=FALSE)
+blog_sentences_clean <- unlist(blog_sentences_clean, use.names=FALSE)
+twitter_sentences_clean <- unlist(twitter_sentences_clean, use.names=FALSE)
+
+# Replace most punctuation, anomalies from text.
+news_sentences_clean <- removePunctuation(news_sentences_clean)
+blog_sentences_clean <- removePunctuation(blog_sentences_clean)
+twitter_sentences_clean <- removePunctuation(twitter_sentences_clean)
+```
+
+## Step 3: Create Subset of data to be used for training
+```{r subset-training-data}
+# Subset clean data (about 33%) to reduce processing time.
+# 33% of each subset: 632945 (news), 649903 (blogs), 866321 (twitter)
+set.seed(21915)
+news_sentences_subset <- sample(news_sentences_clean, 200000) 
+blog_sentences_subset <- sample(news_sentences_clean, 200000) 
+twitter_sentences_subset <- sample(news_sentences_clean, 300000) 
+
+data <- c(news_sentences_subset, blog_sentences_subset, twitter_sentences_subset)
+```
+
+## Step 4: N Grams
+```{r n-grams}
+# Create 1-gram, 2-gram and 3-gram of sample data. 
+# First I need to turn data into a block of text.
+# Then I'll use the ngram's package to preprocess and create the n-grams.        
+data_ng <- concatenate(concatenate(data, collapse =""), data)
+data_ng <- preprocess(data_ng, case ="lower", remove.punct = TRUE)        
+ng1 <- ngram(data_ng, n = 1)
+ng2 <- ngram(data_ng, n = 2)        
+ng3 <- ngram(data_ng, n = 3) 
+ng4 <- ngram(data_ng, n = 4)
+ng5 <- ngram(data_ng, n = 5)
+ng6 <- ngram(data_ng, n = 6)
+ng7 <- ngram(data_ng, n = 7)
+ng8 <- ngram(data_ng, n = 8)       
+
+# Get the top 10 n-grams of each type       
+one_gram <- head(get.phrasetable(ng1), 10) 
+two_gram <- head(get.phrasetable(ng2), 10)  
+three_gram <- head(get.phrasetable(ng3), 10)  
+
+# Plot the n-grams
+options(scipen=999) # Removes scientific notation
+
+barplot(one_gram$freq, main="Top 10 1-Grams in Sample News Dataset", horiz=FALSE,
+        names.arg=one_gram$ngrams, las = 2, ylab="Frequency")
+
+barplot(two_gram$freq, main="Top 10 2-Grams in Sample News Dataset", horiz=FALSE,
+        names.arg=two_gram$ngrams, las = 2, ylab="Frequency")
+
+barplot(three_gram$freq, main="Top 10 3-Grams in Sample News Dataset", horiz=FALSE,
+        names.arg=three_gram$ngrams, las = 2, ylab="Frequency")
+```
+## Step 5: Export Data for Shiny App
+```{r prep_and_export_data}
+one <- get.phrasetable(ng1)
+two <- get.phrasetable(ng2)
+three <- get.phrasetable(ng3)
+four <- get.phrasetable(ng4)
+five <- get.phrasetable(ng5)
+six <- get.phrasetable(ng6)
+seven <- get.phrasetable(ng7)
+eight <- get.phrasetable(ng8)
+
+bigram <- two$ngrams
+trigram <- three$ngrams
+quadrigram <- four$ngrams
+
+save(bigram, file = "bigram.rda")
+save(trigram, file = "trigram.rda")
+save(quadrigram, file = "quadrigram.rda")
+```
+
+## Step 6: In House Testing (Allows for larger ngrams)
+```{r}
+# Example
+phrase <- "Once Upon a"
+pred <- makePrediction(phrase)
+pred
+```
