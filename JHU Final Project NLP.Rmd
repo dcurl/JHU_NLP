@@ -161,49 +161,63 @@ getPredictions <- function(len, locations)  {
         if(len == 7) {
                 j = 1
                 for (i in locations) {
-                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", eight$ngrams[i]))
+                        gram <- eight$ngrams[i]
+                        gram <- tail(strsplit(gram,split=" ")[[1]],1)
+                        print(concatenate("Prediction ", j, ": ", gram))
                         j = j + 1
                 }
         }
         else if(len == 6) {
                 j = 1
                 for (i in locations) {
-                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", seven$ngrams[i]))
+                        gram <- seven$ngrams[i]
+                        gram <- tail(strsplit(gram,split=" ")[[1]],1)
+                        print(concatenate("Prediction ", j, ": ", gram))
                         j = j + 1
                 }
         }
         else if(len == 5){
                 j = 1
                 for (i in locations) {
-                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", six$ngrams[i]))
+                        gram <- six$ngrams[i]
+                        gram <- tail(strsplit(gram,split=" ")[[1]],1)
+                        print(concatenate("Prediction ", j, ": ", gram))
                         j = j + 1
                 }
         }
         else if(len == 4){
                 j = 1
                 for (i in locations) {
-                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", five$ngrams[i]))
+                        gram <- five$ngrams[i]
+                        gram <- tail(strsplit(gram,split=" ")[[1]],1)
+                        print(concatenate("Prediction ", j, ": ", gram))
                         j = j + 1
                 }
         }
         else if(len == 3){
                 j = 1
                 for (i in locations) {
-                       print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", four$ngrams[i]))
+                        gram <- four$ngrams[i]
+                        gram <- tail(strsplit(gram,split=" ")[[1]],1)
+                        print(concatenate("Prediction ", j, ": ", gram))
                         j = j + 1
                 }
         }
         else if(len == 2){
                 j = 1
                 for (i in locations) {
-                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", three$ngrams[i]))
+                        gram <- three$ngrams[i]
+                        gram <- tail(strsplit(gram,split=" ")[[1]],1)
+                        print(concatenate("Prediction ", j, ": ", gram))
                         j = j + 1
                 }
         }
         else if(len == 1){
                 j = 1
                 for (i in locations) {
-                        print(concatenate("Prediction ", j, " at ", "Location ", i, ": ", two$ngrams[i]))
+                        gram <- two$ngrams[i]
+                        gram <- tail(strsplit(gram,split=" ")[[1]],1)
+                        print(concatenate("Prediction ", j, ": ", gram))
                         j = j + 1
                 }
         }
