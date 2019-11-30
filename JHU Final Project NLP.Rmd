@@ -99,7 +99,7 @@ cleanInput<- function(str) {
         return(str)
 }
 
-# Function that finds
+# Function that finds matches in ngrams and returns those match locations.
 findLocations <- function(str) {
         
         # Get length of user entered phrase'
@@ -156,7 +156,7 @@ findLocations <- function(str) {
         }
 }
         
-        
+# Function that converts match locations into actual phrase/word predictions        
 getPredictions <- function(len, locations)  {
         if(len == 7) {
                 j = 1
