@@ -10,13 +10,16 @@ library(dplyr)
 library(ngram) # To create ngrams
 library(tokenizers) # To quickly break a character vector into sentences
 library(textcat) # To detect foreign languages
-library(stringr) # To pull word from vector, didn't end up needing this
+library(stringr) # To pull word from vector
 library(reshape2) # To merge vectors into dataframe
 ```
 
 ## Step 1a: Read in Data
 ```{r readin-data}
 ## Read in US Text files
+## If running this on your computer, make sure to change file location to appropriate location on your computer or online.
+## Data can be downloaded here: https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip
+## Note: I only used the english datasets for my application.
 news_txt <- readLines("~/Documents/Education/JHU/capstone/final/en_US/en_US.news.txt")
 blogs_txt <- readLines("~/Documents/Education/JHU/capstone/final/en_US/en_US.blogs.txt")
 twitter_txt <- readLines("~/Documents/Education/JHU/capstone/final/en_US/en_US.twitter.txt")
@@ -278,8 +281,8 @@ barplot(two_gram$freq, main="Top 10 2-Grams in Sample News Dataset", horiz=FALSE
 barplot(three_gram$freq, main="Top 10 3-Grams in Sample News Dataset", horiz=FALSE,
         names.arg=three_gram$ngrams, las = 2, ylab="Frequency")
 ```
-## Step 5: Export Data for Shiny App
-```{r prep_and_export_data}
+## Step 5: Prep data for within-RMD predictions
+```{r prep_data_RMD_Prediction}
 one <- get.phrasetable(ng1)
 two <- get.phrasetable(ng2)
 three <- get.phrasetable(ng3)
@@ -288,7 +291,9 @@ five <- get.phrasetable(ng5)
 six <- get.phrasetable(ng6)
 seven <- get.phrasetable(ng7)
 eight <- get.phrasetable(ng8)
-
+```
+## Step 6: Prep/export data for shniy app
+```{r prep_data_for_shiny_app}
 bigram <- two$ngrams
 trigram <- three$ngrams
 quadrigram <- four$ngrams
@@ -298,7 +303,7 @@ save(trigram, file = "trigram.rda")
 save(quadrigram, file = "quadrigram.rda")
 ```
 
-## Step 6: In House Testing (Allows for larger ngrams)
+## Step 7: In House Testing (Allows for larger ngrams)
 ```{r}
 # Example
 phrase <- "Once Upon a"
